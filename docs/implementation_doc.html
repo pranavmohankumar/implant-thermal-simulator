@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project #9 Implementation Document - Implant Thermal Dissipation & Tissue Heating Simulator</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; padding: 30px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #0f172a; font-size: 24px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #1e40af; font-size: 18px; margin-top: 25px; }
+        .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; margin-bottom: 15px; }
+        .box { background: #f1f5f9; border-left: 4px solid #3b82f6; padding: 15px; margin: 15px 0; border-radius: 0 6px 6px 0; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        pre { background: #0f172a; color: #f8fafc; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+        footer { margin-top: 40px; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="badge">Project #9 Specification</span>
+        <h1>Implant Thermal Dissipation & Tissue Heating Simulator</h1>
+        <p><strong>Target Industry Profile:</strong> Synchron, Neuralink, FDA Regulatory Compliance Teams</p>
+        
+        <h2>1. System Architecture & Concept</h2>
+        <div class="box">
+            <p>3D Finite-Difference Bio-Heat solver integrating dynamic SoC power dissipation and blood perfusion dynamics.</p>
+        </div>
+
+        <h2>2. Synthetic Bio-Data Engineering Strategy</h2>
+        <p>3D volumetric mesh representing brain parenchyma, blood vessels, and metallic implant housing.</p>
+
+        <h2>3. Low-End LLM Prompt & Module Blueprint</h2>
+        <ul>
+            <li><strong>Module 1: 3D Tissue Mesh Generator:</strong> Construct 3D spatial grid representing tissue density, thermal conductivity, and blood perfusion.</li>
+            <li><strong>Module 2: 3D Pennes Bio-Heat Solver:</strong> Implement numerical update equation for 3D thermal diffusion and perfusion heat sink.</li>
+            <li><strong>Module 3: Thermal Safety Interlock Logic:</strong> Model dynamic SoC clock throttling when tissue temperature rise exceeds 0.8°C.</li>
+        </ul>
+
+        <h2>4. Core Technical Starter Skeleton</h2>
+        <pre><code>import numpy as np
+
+def pennes_bioheat_3d(T, Q_implant, dt=0.05, dx=1e-3):
+    k = 0.52 # W/(m K)
+    rho_c = 3.6e6 # J/(m3 K)
+    w_b_cb = 0.02
+    T_art = 37.0
+    
+    laplacian = (np.pad(T[1:,:,:], ((0,1),(0,0),(0,0))) + np.pad(T[:-1,:,:], ((1,0),(0,0),(0,0))) +
+                 np.pad(T[:,1:,:], ((0,0),(0,1),(0,0))) + np.pad(T[:,:-1,:], ((0,0),(1,0),(0,0))) +
+                 np.pad(T[:,:,1:], ((0,0),(0,0),(0,1))) + np.pad(T[:,:,:-1], ((0,0),(0,0),(1,0))) - 6*T) / (dx**2)
+    
+    dT_dt = (k * laplacian - w_b_cb * (T - T_art) + Q_implant) / rho_c
+    return T + dT_dt * dt
+</code></pre>
+
+        <footer>
+            <p>Neurotech Technical Blueprint | Prepared for Pranav Mohankumar | UIUC Neural Engineering</p>
+        </footer>
+    </div>
+</body>
+</html>
